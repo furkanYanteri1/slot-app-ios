@@ -132,7 +132,7 @@ struct ContentView: View {
                                 .shadow(color: .gray, radius: 7, y: 7)
                             )
                             .overlay(
-                                    // Shining border
+                                    // Shining borde
                                     Hexagoni()
                                         .stroke(
                                             LinearGradient(
