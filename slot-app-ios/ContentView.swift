@@ -36,7 +36,7 @@ enum Choice: Int, Identifiable {
 
 struct ContentView: View {
     @State public var symbols = ["eating","happy","love"]
-    @State public var numbers = [0,1,2]
+    @State public var numbers = [0,1,2,1,0]
     @State public var counter = 0
     @State private var showingAlert: Choice?
     @State private var rotation: Double = 0
@@ -68,7 +68,7 @@ struct ContentView: View {
                     HStack(spacing: 35) {
                         Hexagoni().fill(Color.green).opacity(0.7)
                             .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[0])
+                        .overlay(Image(symbols[numbers[0]])
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 80, height: 70, alignment: .center)
@@ -88,7 +88,7 @@ struct ContentView: View {
                         
                         Hexagoni().fill(Color.green).opacity(0.7)
                             .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[numbers[0]])
+                            .overlay(Image(symbols[numbers[1]])
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 80, height: 70, alignment: .center)
@@ -109,7 +109,7 @@ struct ContentView: View {
                     
                     Hexagoni().fill(Color.green).opacity(0.7)
                         .frame(width: 100, height: 120, alignment: .center)
-                        .overlay(Image(symbols[numbers[0]])
+                        .overlay(Image(symbols[numbers[2]])
                             .resizable()
                             .scaledToFit()
                             .frame(width: 80, height: 70, alignment: .center)
@@ -130,7 +130,7 @@ struct ContentView: View {
                     HStack(spacing: 35) {
                         Hexagoni().fill(Color.green).opacity(0.7)
                             .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[0])
+                            .overlay(Image(symbols[numbers[3]])
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 80, height: 70, alignment: .center)
@@ -151,7 +151,7 @@ struct ContentView: View {
                         Hexagoni()
                             .fill(Color.green).opacity(0.7)
                             .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[numbers[0]])
+                            .overlay(Image(symbols[numbers[4]])
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 80, height: 70, alignment: .center)
@@ -172,7 +172,27 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
-                    print("hello")
+                    self.numbers[0] = Int.random(in: 0...2)
+                    self.numbers[1] = Int.random(in: 0...2)
+                    self.numbers[2] = Int.random(in: 0...2)
+                    self.numbers[3] = Int.random(in: 0...2)
+                    self.numbers[4] = Int.random(in: 0...2)
+                    
+                    counter += 1
+//                    if Set(self.numbers).count <= 1 {// checking if all the same
+                    if self.numbers[0] ==  self.numbers[1] &&
+                        self.numbers[2] == self.numbers[3] &&
+                        self.numbers[1] == self.numbers[2] &&
+                        self.numbers[0] == self.numbers[4]
+                    {// checking if all the same
+                        self.showingAlert = .success
+                        counter = 0
+                    }
+                    if counter > 10 {
+                        self.showingAlert = .failure
+                        counter = 0
+                    }
+                    
                 }) {
                     Text("SPIN")
                         .font(.title)
@@ -227,6 +247,15 @@ struct ContentView: View {
                             textColor = .pink
                         }
                     }
+                }
+            }
+            .alert(item: $showingAlert){ alert -> Alert in
+                switch alert {
+                    case .success:
+                        return Alert(title: Text("NICE"), message: Text("You got it!"), dismissButton: .cancel())
+                    case .failure:
+                        return Alert(title: Text("OOPS"), message: Text("Opsie opsie! TRY AGAIN:("), dismissButton: .cancel())
+                        
                 }
             }
         }
