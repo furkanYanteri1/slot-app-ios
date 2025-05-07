@@ -41,6 +41,8 @@ struct ContentView: View {
     @State private var showingAlert: Choice?
     @State private var rotation: Double = 0
     @State private var textColor: Color = .white
+    @State private var isShuffling = false
+
     
     var body: some View {
         ZStack {
@@ -172,27 +174,31 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
-                    self.numbers[0] = Int.random(in: 0...2)
-                    self.numbers[1] = Int.random(in: 0...2)
-                    self.numbers[2] = Int.random(in: 0...2)
-                    self.numbers[3] = Int.random(in: 0...2)
-                    self.numbers[4] = Int.random(in: 0...2)
-                    
-                    counter += 1
-//                    if Set(self.numbers).count <= 1 {// checking if all the same
-                    if self.numbers[0] ==  self.numbers[1] &&
-                        self.numbers[2] == self.numbers[3] &&
-                        self.numbers[1] == self.numbers[2] &&
-                        self.numbers[0] == self.numbers[4]
-                    {// checking if all the same
-                        self.showingAlert = .success
-                        counter = 0
+                    isShuffling = true
+                    var shuffleCount = 0
+                    let maxShuffles = 30 // Adjust for desired shuffling speed and duration
+                    let shuffleInterval = 0.1 // Time between shuffles
+
+                    Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
+                        for i in 0..<numbers.count {
+                            numbers[i] = Int.random(in: 0...2)
+                        }
+                        shuffleCount += 1
+                        if shuffleCount >= maxShuffles {
+                            timer.invalidate()
+                            isShuffling = false
+
+                            // Determine final result
+                            counter += 1
+                            if numbers.allSatisfy({ $0 == numbers.first }) {
+                                showingAlert = .success
+                                counter = 0
+                            } else if counter > 10 {
+                                showingAlert = .failure
+                                counter = 0
+                            }
+                        }
                     }
-                    if counter > 10 {
-                        self.showingAlert = .failure
-                        counter = 0
-                    }
-                    
                 }) {
                     Text("SPIN")
                         .font(.title)
@@ -218,6 +224,7 @@ struct ContentView: View {
                         )
                         .shadow(color: .green.opacity(0.5), radius: 10, y: 10)
                 }
+
                 .onAppear {
                     withAnimation(Animation.linear(duration: 2).repeatForever(autoreverses: false)) {
                         rotation = 360
