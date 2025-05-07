@@ -42,8 +42,9 @@ struct ContentView: View {
     @State private var rotation: Double = 0
     @State private var textColor: Color = .white
     @State private var isShuffling = false
+    @State private var buttonOpacity: Double = 1.0
+    @State private var buttonScale: CGFloat = 1.0
 
-    
     var body: some View {
         ZStack {
             Image("sunshine")
@@ -174,28 +175,42 @@ struct ContentView: View {
                 }
                 
                 Button(action: {
-                    isShuffling = true
-                    var shuffleCount = 0
-                    let maxShuffles = 30 // Adjust for desired shuffling speed and duration
-                    let shuffleInterval = 0.1 // Time between shuffles
+                    // Fade out the button
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        buttonOpacity = 0.0
+                        buttonScale = 0.8
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isShuffling = true
+                        var shuffleCount = 0
+                        let maxShuffles = 20 // Adjust for desired shuffling speed and duration
+                        let shuffleInterval = 0.1 // Time between shuffles
 
-                    Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
-                        for i in 0..<numbers.count {
-                            numbers[i] = Int.random(in: 0...2)
-                        }
-                        shuffleCount += 1
-                        if shuffleCount >= maxShuffles {
-                            timer.invalidate()
-                            isShuffling = false
+                        Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
+                            for i in 0..<numbers.count {
+                                numbers[i] = Int.random(in: 0...2)
+                            }
+                            shuffleCount += 1
+                            if shuffleCount >= maxShuffles {
+                                timer.invalidate()
+                                isShuffling = false
 
-                            // Determine final result
-                            counter += 1
-                            if numbers.allSatisfy({ $0 == numbers.first }) {
-                                showingAlert = .success
-                                counter = 0
-                            } else if counter > 10 {
-                                showingAlert = .failure
-                                counter = 0
+                                // Bounce back the button
+                                withAnimation(.interpolatingSpring(stiffness: 200, damping: 10)) {
+                                    buttonOpacity = 1.0
+                                    buttonScale = 1.0
+                                }
+                                
+                                // Determine final result
+                                counter += 1
+                                if numbers.allSatisfy({ $0 == numbers.first }) {
+                                    showingAlert = .success
+                                    counter = 0
+                                } else if counter > 10 {
+                                    showingAlert = .failure
+                                    counter = 0
+                                }
                             }
                         }
                     }
@@ -224,6 +239,9 @@ struct ContentView: View {
                         )
                         .shadow(color: .green.opacity(0.5), radius: 10, y: 10)
                 }
+                .opacity(buttonOpacity)
+                .scaleEffect(buttonScale)
+                .disabled(isShuffling)
 
                 .onAppear {
                     withAnimation(Animation.linear(duration: 2).repeatForever(autoreverses: false)) {
