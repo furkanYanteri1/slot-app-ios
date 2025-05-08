@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Hexagoni: Shape {
     func path(in rect: CGRect) -> Path {
-        return Path{ path in
+        return Path { path in
             let p1 = CGPoint(x: 0, y: 20)
             let p2 = CGPoint(x: 0, y: rect.height - 20)
             let p3 = CGPoint(x: rect.width/2, y: rect.height)
@@ -28,15 +28,13 @@ struct Hexagoni: Shape {
 }
 
 enum Choice: Int, Identifiable {
-    var id: Int {
-        return rawValue
-    }
+    var id: Int { rawValue }
     case success, failure
 }
 
 struct ContentView: View {
-    @State public var symbols = ["eating","happy","love"]
-    @State public var numbers = [0,1,2,1,0]
+    @State public var symbols = ["eating", "happy", "love"]
+    @State public var numbers = [0, 1, 2, 1, 0]
     @State public var counter = 0
     @State private var showingAlert: Choice?
     @State private var rotation: Double = 0
@@ -45,79 +43,78 @@ struct ContentView: View {
     @State private var buttonOpacity: Double = 1.0
     @State private var buttonScale: CGFloat = 1.0
 
+    private let maxTries = 10 // Total tries allowed before failure
+
     var body: some View {
         ZStack {
             Image("sunshine")
                 .resizable()
                 .ignoresSafeArea(.all)
-            
+
             VStack(alignment: .center, spacing: 80) {
-                HStack {
-                    Image("fire")
-                        .resizable()
-                        .scaledToFit()
-                        .shadow(color: .orange, radius: 15, y: 5)
-                    Text("Slot Machine")
-                        .font(.system(size:30))
-                        .fontWeight(.black)
-                    Image("fire")
-                        .resizable()
-                        .scaledToFit()
-                        .shadow(color: .orange, radius: 15, y: 5)
+                VStack(spacing: 8) {
+                    HStack {
+                        Image("fire")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 40)
+                            .shadow(color: .orange, radius: 15, y: 5)
+
+                        Text("Slot Machine")
+                            .font(.system(size: 30))
+                            .fontWeight(.black)
+
+                        Image("fire")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 40)
+                            .shadow(color: .orange, radius: 15, y: 5)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                    Text("Remaining Tries: \(max(0, maxTries - counter))")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 12)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.4))
+                                .overlay(Capsule().stroke(Color.white.opacity(0.5), lineWidth: 1))
+                        )
                 }
-                .frame(width: .infinity, height: 50, alignment: .center)
-                
+
                 VStack(spacing: 15) {
                     HStack(spacing: 35) {
-                        Hexagoni().fill(Color.green).opacity(0.7)
-                            .frame(width: 100, height: 120, alignment: .center)
-                        .overlay(Image(symbols[numbers[0]])
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 70, alignment: .center)
-                                .shadow(color: .gray, radius: 7, y: 7)
-                            )
-                            .overlay(
-                                Hexagoni()
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [Color.white.opacity(1), Color.clear]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 5
-                                    )
-                            )
-                        
-                        Hexagoni().fill(Color.green).opacity(0.7)
-                            .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[numbers[1]])
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 70, alignment: .center)
-                                .shadow(color: .gray, radius: 7, y: 7)
-                            )
-                            .overlay(
-                                Hexagoni()
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [Color.white.opacity(0.8), Color.clear]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 5
-                                    )
-                            )
+                        ForEach([0, 1], id: \.self) { i in
+                            Hexagoni().fill(Color.green).opacity(0.7)
+                                .frame(width: 100, height: 120)
+                                .overlay(Image(symbols[numbers[i]])
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 70)
+                                    .shadow(color: .gray, radius: 7, y: 7))
+                                .overlay(
+                                    Hexagoni()
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [Color.white.opacity(0.8), Color.clear]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 5
+                                        )
+                                )
+                        }
                     }
-                    
+
                     Hexagoni().fill(Color.green).opacity(0.7)
-                        .frame(width: 100, height: 120, alignment: .center)
+                        .frame(width: 100, height: 120)
                         .overlay(Image(symbols[numbers[2]])
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 80, height: 70, alignment: .center)
-                            .shadow(color: .gray, radius: 7, y: 7)
-                        )
+                            .frame(width: 80, height: 70)
+                            .shadow(color: .gray, radius: 7, y: 7))
                         .overlay(
                             Hexagoni()
                                 .stroke(
@@ -129,63 +126,42 @@ struct ContentView: View {
                                     lineWidth: 5
                                 )
                         )
-                    
+
                     HStack(spacing: 35) {
-                        Hexagoni().fill(Color.green).opacity(0.7)
-                            .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[numbers[3]])
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 70, alignment: .center)
-                                .shadow(color: .gray, radius: 7, y: 7)
-                            )
-                            .overlay(
-                                Hexagoni()
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [Color.white.opacity(0.8), Color.clear]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 5
-                                    )
-                            )
-                        
-                        Hexagoni()
-                            .fill(Color.green).opacity(0.7)
-                            .frame(width: 100, height: 120, alignment: .center)
-                            .overlay(Image(symbols[numbers[4]])
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 70, alignment: .center)
-                                .shadow(color: .gray, radius: 7, y: 7)
-                            )
-                            .overlay(
-                                Hexagoni()
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [Color.white.opacity(0.8), Color.clear]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 5
-                                    )
-                            )
+                        ForEach([3, 4], id: \.self) { i in
+                            Hexagoni().fill(Color.green).opacity(0.7)
+                                .frame(width: 100, height: 120)
+                                .overlay(Image(symbols[numbers[i]])
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 70)
+                                    .shadow(color: .gray, radius: 7, y: 7))
+                                .overlay(
+                                    Hexagoni()
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [Color.white.opacity(0.8), Color.clear]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 5
+                                        )
+                                )
+                        }
                     }
                 }
-                
+
                 Button(action: {
-                    // Fade out the button
                     withAnimation(.easeOut(duration: 0.3)) {
                         buttonOpacity = 0.0
                         buttonScale = 0.8
                     }
-                    
+
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         isShuffling = true
                         var shuffleCount = 0
-                        let maxShuffles = 20 // Adjust for desired shuffling speed and duration
-                        let shuffleInterval = 0.1 // Time between shuffles
+                        let maxShuffles = 20
+                        let shuffleInterval = 0.1
 
                         Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
                             for i in 0..<numbers.count {
@@ -196,18 +172,16 @@ struct ContentView: View {
                                 timer.invalidate()
                                 isShuffling = false
 
-                                // Bounce back the button
                                 withAnimation(.interpolatingSpring(stiffness: 200, damping: 10)) {
                                     buttonOpacity = 1.0
                                     buttonScale = 1.0
                                 }
-                                
-                                // Determine final result
+
                                 counter += 1
                                 if numbers.allSatisfy({ $0 == numbers.first }) {
                                     showingAlert = .success
                                     counter = 0
-                                } else if counter > 10 {
+                                } else if counter >= maxTries {
                                     showingAlert = .failure
                                     counter = 0
                                 }
@@ -242,45 +216,42 @@ struct ContentView: View {
                 .opacity(buttonOpacity)
                 .scaleEffect(buttonScale)
                 .disabled(isShuffling)
-
                 .onAppear {
                     withAnimation(Animation.linear(duration: 2).repeatForever(autoreverses: false)) {
                         rotation = 360
                     }
-                    
-                    // Start the color animation
+
                     withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                         textColor = .pink
                     }
                 }
                 .onChange(of: textColor) {
-                    if textColor == .pink {
-                        withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            textColor = .yellow
-                        }
-                    } else if textColor == .yellow {
-                        withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            textColor = .white
-                        }
-                    }
-                    else if textColor == .white {
-                        withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            textColor = .green
-                        }
-                    } else {
-                        withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            textColor = .pink
-                        }
+                    switch textColor {
+                        case .pink:
+                            withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                textColor = .yellow
+                            }
+                        case .yellow:
+                            withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                textColor = .white
+                            }
+                        case .white:
+                            withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                textColor = .green
+                            }
+                        default:
+                            withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                textColor = .pink
+                            }
                     }
                 }
             }
-            .alert(item: $showingAlert){ alert -> Alert in
+            .alert(item: $showingAlert) { alert -> Alert in
                 switch alert {
                     case .success:
                         return Alert(title: Text("NICE"), message: Text("You got it!"), dismissButton: .cancel())
                     case .failure:
                         return Alert(title: Text("OOPS"), message: Text("Opsie opsie! TRY AGAIN:("), dismissButton: .cancel())
-                        
                 }
             }
         }
