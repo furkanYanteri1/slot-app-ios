@@ -1,7 +1,8 @@
 
-Iphone SLOT game,
-Swift, swiftui
-10 trying per session, once got 5 of a kind it's a success, end of 10, failure but try again for free.
+## Iphone SLOT game
+- Swift, swiftui
+- 10 trying per session, once got 5 of a kind it's a success, end of 10, failure but try again for free.
+
 Note: Couldn't catch a 5 of a kind recording the video, it's on you, good luck with that.
 
 
